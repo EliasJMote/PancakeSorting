@@ -15,14 +15,16 @@ def main():
 	# ShufflePancakes(pancakes, 40320)
 
 	# Get the permutation from user input
-	permutation = [3, 1, 2, 4, 5, 6, 7, 8] # [8,7,2,6,9,3,1,5,4]  # [4, 3, 5, 6, 1, 8, 2, 7] # get_input()
-
-	# Call BFS
-	#BFS(permutation)
-	#print(MyBFS(permutation))
+	permutation = get_input()
+	#permutation = [3, 1, 2, 4, 5, 6, 7, 8] # [8,7,2,6,9,3,1,5,4]  # [4, 3, 5, 6, 1, 8, 2, 7] # get_input()
 
 	# Call IDS
 	DoIDSWork(permutation)
+
+	# Call BFS
+	BFS(permutation)
+
+	
 
 
 # def MyBFS(permutation):
@@ -163,7 +165,7 @@ def IsValid(key):
 # n, where n is the number of keys to reverse. n = 5 would reverse
 # the keys from 1 to 5.
 def SwapPancakes(pancakes, num_to_swap):
-	for i in range(num_to_swap / 2):
+	for i in range(num_to_swap // 2):
 		pancakes[i], pancakes[(num_to_swap - 1) - i] = pancakes[(num_to_swap - 1) - i], pancakes[i]
 
 
@@ -287,14 +289,8 @@ def BFS(start):
 		currentNode = queue[0]
 		del queue[0]
 
-		# Check if we have arrived at the correct permutation
-		if(check_perm(currentNode[0])):
-			print_output(pointers,currentNode[1],start,visited_states,max_queue,
-				start_time)
-			return
-
 		# For each reversal length
-		for l in range(len(currentNode[0]),2,-1):
+		for l in range(len(currentNode[0]),1,-1):
 
 			# For each initial position we are reversing
 			for pos in range(0,l):
@@ -315,11 +311,17 @@ def BFS(start):
 				if(len(queue) > max_queue):
 					max_queue = len(queue)
 
+				# Check if we have arrived at the correct permutation
+				if(check_perm(succ)):
+					print_output(pointers,len(pointers)-1,start,visited_states,max_queue,
+						start_time)
+					return
+
 # Get the permutation input from the user
 def get_input():
 
 	# Ask the user for an input permutation P
-	permutation = raw_input("Please enter input permutation: ")
+	permutation = input("Please enter input permutation: ")
 
 	# Split the elements up
 	permutation = permutation.split(' ')
