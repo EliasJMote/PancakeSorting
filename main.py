@@ -11,11 +11,8 @@ ids_max_stack_size = 0
 
 
 def main():
-	# pancakes = [3, 1, 2, 4, 5, 6, 7, 8]
-	# ShufflePancakes(pancakes, 40320)
-
 	# Get the permutation from user input
-	permutation = [4, 3, 5, 6, 1, 8, 2, 7] # get_input()
+	permutation = [8,7,2,6,9,3,1,5,4] # get_input()
 
 	# Call BFS
 	#BFS(permutation)
@@ -68,6 +65,9 @@ def IDS(start_node, max_depth):
 		print("starting IDS depth", i)
 		parent = []
 		res = DFS(start_node, parent, i)
+		print("visited states", ids_total_visited_states)
+		print("max stack size", ids_max_stack_size)
+		print("max stack size", ids_max_stack_size)
 		if(res):
 			return (True, parent)
 	return (False, [])
@@ -126,27 +126,31 @@ class Node:
 # What we return is a new list consisting of the reversed portion
 # at the front and the regular portion at the back.
 def GenerateSuccessors(key):
-	for i in range(2, len(key)):
-		# We want to swap only from 0 to n.
-		# The slice below will make a new list consisting of
-		# elements 0 to i (not including element i).
-		newKeyStart = key[0:i]
+	for i in range(0, len(key)):
+		for j in range(i, len(key) + 1):
+			newKeyStart = key[0:i]
 
-		# Reverses that list.
-		newKeyStart = newKeyStart[::-1]
+			# We want to swap only from 0 to n.
+			# The slice below will make a new list consisting of
+			# elements 0 to i (not including element i).
+			newKeyReversedMiddle = key[i:j]
 
-		# Grid the elements from i to the end, where the end can
-		# just be defined as the length of the key.
-		newKeyEnd = key[i:len(key)]
+			# Reverses that list.
+			newKeyReversedMiddle = newKeyReversedMiddle[::-1]
 
-		# Create a final list with the reversed start and normal end.
-		newKey = newKeyStart + newKeyEnd
+			# Grid the elements from i to the end, where the end can
+			# just be defined as the length of the key.
+			newKeyEnd = key[j:len(key)]
 
-		# Create a new node with our partially reversed list as the key
-		# and yield it to the caller.
-		newNode = Node()
-		newNode.key = newKey
-		yield newNode
+			# Create a final list with the original start,
+			# reversed middle and normal end.
+			newKey = newKeyStart + newKeyReversedMiddle + newKeyEnd
+
+			# Create a new node with our partially reversed list as the key
+			# and yield it to the caller.
+			newNode = Node()
+			newNode.key = newKey
+			yield newNode
 
 
 # Checks if a key is in the form 1, 2, 3, ... n
