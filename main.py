@@ -1,4 +1,4 @@
-# Project 2
+# CS480 Project 2
 # Created by: Elias Mote and Justin Ramos
 # Date: 9/26/18
 
@@ -12,23 +12,21 @@ ids_max_stack_size = 0
 
 def main():
 	# Get the permutation from user input
-	#permutation = get_input()
-	permutation = [8,7,2,6,9,3,1,5,4]  # [4, 3, 5, 6, 1, 8, 2, 7] # get_input()
-
-	# Call BFS
-	#BFS(permutation)
-	#print(MyBFS(permutation))
-
-	# Call IDS
-	DoIDSWork(permutation)
+	permutation = get_input()
 
 	# Call BFS
 	BFS(permutation)
 
-	
+	print()
+
+	# Call IDS
+	DoIDSWork(permutation)
 
 
 def DoIDSWork(permutation):
+	print("Starting IDS Search")
+	startTime = datetime.datetime.now()
+
 	# Create our starting node.
 	startNode = Node()
 	startNode.key = permutation
@@ -38,6 +36,9 @@ def DoIDSWork(permutation):
 	# Call IDS. It will return a True/False result and
 	# a parent array.
 	res, parent = IDS(startNode, MAX_IDS_DEPTH)
+
+	endTime = datetime.datetime.now()
+	elapsedTime = endTime - startTime
 
 	# Operate on the results.
 	if(res):
@@ -55,11 +56,13 @@ def DoIDSWork(permutation):
 		solutionPath = solutionPath[::-1]
 
 		# Print out the solution path.
+		print("Successive states:")
 		for i in range(len(solutionPath)):
 			print(solutionPath[i].key)
 
-		print("visited states", ids_total_visited_states)
-		print("max stack size", ids_max_stack_size)
+		print("CPU time: " + str(float(elapsedTime.seconds) + float(elapsedTime.microseconds) / 1000000) + " second(s)")
+		print("Total number of visited states = " + str(ids_total_visited_states))
+		print("Max stack size = " + str(ids_max_stack_size))
 	else:
 		print("no solution found in depth", MAX_IDS_DEPTH)
 
@@ -68,12 +71,8 @@ def DoIDSWork(permutation):
 # Will return the path to a solvable solution.
 def IDS(start_node, max_depth):
 	for i in range(1, max_depth + 1):
-		print("starting IDS depth", i)
 		parent = []
 		res = DFS(start_node, parent, i)
-		print("visited states", ids_total_visited_states)
-		print("max stack size", ids_max_stack_size)
-		print("max stack size", ids_max_stack_size)
 		if(res):
 			return (True, parent)
 	return (False, [])
@@ -161,12 +160,12 @@ def GenerateSuccessors(key):
 
 # Checks if a key is in the form 1, 2, 3, ... n
 def IsValid(key):
-	max = -1
+	mMax = -1
 
 	for i in key:
-		if(max > i):
+		if(mMax > i):
 			return False
-		max = i
+		mMax = i
 	return True
 
 
@@ -263,6 +262,8 @@ This is repeated until the sorted permutation is found, at which point the
 results are reported.
 """
 def BFS(start):
+	print("Starting BFS Search")
+
 	# Get start time
 	start_time = datetime.datetime.now()
 
