@@ -12,7 +12,8 @@ ids_max_stack_size = 0
 
 def main():
 	# Get the permutation from user input
-	permutation = [8,7,2,6,9,3,1,5,4] # get_input()
+	#permutation = get_input()
+	permutation = [8,7,2,6,9,3,1,5,4]  # [4, 3, 5, 6, 1, 8, 2, 7] # get_input()
 
 	# Call BFS
 	#BFS(permutation)
@@ -20,6 +21,11 @@ def main():
 
 	# Call IDS
 	DoIDSWork(permutation)
+
+	# Call BFS
+	BFS(permutation)
+
+	
 
 
 def DoIDSWork(permutation):
@@ -237,8 +243,9 @@ def print_output(pointers,indx,start,visited_states,max_queue,start_time):
 
 	# Print cpu time
 	cpu_time = end_time-start_time
-	print("CPU time: " + str(cpu_time.seconds) + " second(s) and "
-		+ str(cpu_time.microseconds) + " microseconds")
+	print("CPU time: " 
+		+ str(float(cpu_time.seconds) + float(cpu_time.microseconds) / 1000000)
+		+ " second(s)")
 
 	# Print how many states we have visited
 	print("Total number of visited states = " + str(visited_states))
@@ -284,14 +291,8 @@ def BFS(start):
 		currentNode = queue[0]
 		del queue[0]
 
-		# Check if we have arrived at the correct permutation
-		if(check_perm(currentNode[0])):
-			print_output(pointers,currentNode[1],start,visited_states,max_queue,
-				start_time)
-			return
-
 		# For each reversal length
-		for l in range(len(currentNode[0]),2,-1):
+		for l in range(len(currentNode[0]),1,-1):
 
 			# For each initial position we are reversing
 			for pos in range(0,l):
@@ -311,6 +312,12 @@ def BFS(start):
 				# Check if the max queue size has been increased and update
 				if(len(queue) > max_queue):
 					max_queue = len(queue)
+
+				# Check if we have arrived at the correct permutation
+				if(check_perm(succ)):
+					print_output(pointers,len(pointers)-1,start,visited_states,max_queue,
+						start_time)
+					return
 
 # Get the permutation input from the user
 def get_input():
