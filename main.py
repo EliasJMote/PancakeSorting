@@ -242,8 +242,9 @@ def print_output(pointers,indx,start,visited_states,max_queue,start_time):
 
 	# Print cpu time
 	cpu_time = end_time-start_time
-	print("CPU time: " + str(cpu_time.seconds) + " second(s) and "
-		+ str(cpu_time.microseconds) + " microseconds")
+	print("CPU time: " 
+		+ str(float(cpu_time.seconds) + float(cpu_time.microseconds) / 1000000)
+		+ " second(s)")
 
 	# Print how many states we have visited
 	print("Total number of visited states = " + str(visited_states))
