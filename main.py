@@ -2,29 +2,91 @@
 # Created by: Elias Mote and Justin Ramos
 # Date: 9/26/18
 
-from random import choice
+
 import datetime
 
 
+ids_total_visited_states = 0
+ids_max_stack_size = 0
+
+
 def main():
-	#pancakes = [3, 1, 2, 4, 5, 6, 7, 8]
-	#ShufflePancakes(pancakes, 40320)
+	# pancakes = [3, 1, 2, 4, 5, 6, 7, 8]
+	# ShufflePancakes(pancakes, 40320)
 
 	# Get the permutation from user input
-	permutation = get_input()
+	permutation = [3, 1, 2, 4, 5, 6, 7, 8] # [8,7,2,6,9,3,1,5,4]  # [4, 3, 5, 6, 1, 8, 2, 7] # get_input()
 
 	# Call BFS
-	BFS(permutation)
+	#BFS(permutation)
+	#print(MyBFS(permutation))
 
 	# Call IDS
-	print(IDS(permutation, 10))
+	DoIDSWork(permutation)
 
-	res, parent = IDS(permutation, 100)
-	for i in parent:
-		print str(i) + " --> ",
 
+# def MyBFS(permutation):
+# 	start = Node()
+# 	start.key = permutation
+# 	start.parent = []
+# 	start.depth = 0
+#
+# 	stack = [start]
+#
+# 	while(len(stack) > 0):
+# 		currentNode = stack.pop()
+#
+# 		if(IsValid(currentNode.key)):
+# 			return True
+#
+# 		for nextKey in GenerateSuccessors(currentNode.key):
+# 			if(nextKey != currentNode.parent):
+# 				newNode = Node()
+# 				newNode.key = nextKey
+# 				newNode.parent = currentNode.key
+#
+# 				stack.append(newNode)
+#
+# 	return False
+
+
+def DoIDSWork(permutation):
+	MAX_DEPTH = 10
+	startNode = Node()
+	startNode.key = permutation
+	startNode.parent = []
+	startNode.depth = 1
+
+	res, parent = IDS(startNode, MAX_DEPTH)
+	if(res):
+		solutionPath = []
+
+		# The last node added to the parent array is our solution
+		solution = parent[-1]
+		# Following the pointers backwards until we arrive at the
+		# root node, which is the only node with a parent of [].
+		while(solution != []):
+			solutionPath.append(solution)
+			solution = solution.parent
+
+		# Reverse the solution path.
+		solutionPath = solutionPath[::-1]
+
+		# Print out the solution path.
+		for i in range(len(solutionPath)):
+			print(solutionPath[i].key)
+
+		print("visited states", ids_total_visited_states)
+		print("max stack size", ids_max_stack_size)
+	else:
+		print("no solution found in depth", MAX_DEPTH)
+
+# Iterative Deepening Search
+# Calls DFS with a successively greater allowable depth.
+# Will return the path to a solvable solution.
 def IDS(pancakes, max_depth):
 	for i in range(1, max_depth + 1):
+		print("starting IDS depth", i)
 		parent = []
 		res = DFS(pancakes, parent, i)
 		if(res):
@@ -32,39 +94,61 @@ def IDS(pancakes, max_depth):
 	return (False, [])
 
 
-
-# start is a node
-# parent is a key
-# depth is an int
-def DFS(start, parent, depth):
+# Depth First Search
+# Takes a starting key, an array of parent keys,
+# and a maximum allowable depth.
+def DFS(start, parent, max_depth):
 	stack = [start]
-	parent.append(start)
-	while(len(stack) > 0):
-		current = stack.pop()
-		if(IsValid(current)): # Is valid means current is of the form [1 2 ... n]
-			return True
-		if(depth == 0): # We've reached our maximum depth
-			return False
-		for nextNode in GenerateSuccessors(current):
-			if(nextNode != parent[-1]):
-				res = DFS(nextNode, parent, depth - 1)
-				if(res):
-					return True
-				del parent[-1]
+	AddOneToIDSTotalVisitedStates()
 
+	while(len(stack) > 0):
+		AddOneToIDSTotalVisitedStates()
+		if(len(stack) > ids_max_stack_size):
+			SetIDSMaxStackSize(len(stack))
+
+		currentNode = stack.pop()
+		parent.append(currentNode)
+
+		if(IsValid(currentNode.key)): # Is valid means current is of the form [1 2 ... n]
+			return True
+
+		if(currentNode.depth >= max_depth): # We've reached our maximum depth
+			pass # We won't add any new nodes in this case
+		else:
+			newNodes = []
+
+			for nextNode in GenerateSuccessors(currentNode.key):
+				if(nextNode.key != currentNode.parent):
+					nextNode.parent = currentNode
+					nextNode.depth = currentNode.depth + 1
+					newNodes.append(nextNode)
+
+			# Append the new nodes to the start of the stack
+			# because that's how DFS works.
+			stack = newNodes + stack
 
 	return False
 
+class Node:
+	key = []
+	parent = None
+	depth = 0
 
 
+# Generates all possible swaps that can be made for a given key.
+# Swap are of the form reversing a subset of entries in the key,
+# always started from the top. eg reversing a key from 1 to 4
+# or 1 to n, more generally.
 def GenerateSuccessors(key):
 	for i in range(len(key)):
 		toSwap = list(key)
 		SwapPancakes(toSwap, i + 1) # +1 because we want to swap 1 to n, not 0 to n-1
-		yield toSwap
+		newNode = Node()
+		newNode.key = toSwap
+		yield newNode
 
 
-
+# Checks if a key is in the form 1, 2, 3, ... n
 def IsValid(key):
 	if(len(key) > 0):
 		prev = key[0]
@@ -75,45 +159,22 @@ def IsValid(key):
 	return True
 
 
-
-
-
-
-def ShufflePancakes(pancakes, num_shuffles):
-	for i in CoolRange(num_shuffles):
-		rand = choice(range(1, len(pancakes) + 1))
-		SwapPancakes(pancakes, rand)
-
-
-
-
-
+# Reverses a subset of a key, always starting at 1 and going to
+# n, where n is the number of keys to reverse. n = 5 would reverse
+# the keys from 1 to 5.
 def SwapPancakes(pancakes, num_to_swap):
 	for i in range(num_to_swap / 2):
 		pancakes[i], pancakes[(num_to_swap - 1) - i] = pancakes[(num_to_swap - 1) - i], pancakes[i]
 
 
+def AddOneToIDSTotalVisitedStates():
+	global ids_total_visited_states
+	ids_total_visited_states += 1
 
 
-
-
-
-def CoolRange(n):
-	i = 0
-	while(i < n):
-		yield i
-		i += 1
-
-
-
-
-
-
-
-
-# class Node():
-# 	def __init__(self, key):
-# 		self.key = key
+def SetIDSMaxStackSize(size):
+	global ids_max_stack_size
+	ids_max_stack_size = size
 
 
 # Reverse a block with a given index start and length
@@ -152,7 +213,7 @@ def check_perm(perm):
 		else:
 			return False
 
-	 # If the permutation is sorted, return true
+	# If the permutation is sorted, return true
 	return True
 
 # Print the results
